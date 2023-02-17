@@ -1,3 +1,5 @@
+import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
+import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/components/sign_in.dart';
 import 'package:flutter_application_1/components/textfield.dart';
@@ -5,11 +7,31 @@ import 'package:google_fonts/google_fonts.dart';
 
 class SignupScreen extends StatelessWidget {
   SignupScreen({super.key});
+
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
   final secondpasswordController = TextEditingController();
 
-  void SignUserUp() {}
+  Future<void> signUserUp() async {
+    try {
+      final userAttributes = <CognitoUserAttributeKey, String>{
+        CognitoUserAttributeKey.email: usernameController.text,
+        // additional attributes as needed
+        // CognitoUserAttributeKey.phoneNumber: '+15559101234',
+      };
+      // const result =
+      await Amplify.Auth.signUp(
+        // TODO: Add username field
+        username: uuid(),
+        password: passwordController.text,
+        options: CognitoSignUpOptions(userAttributes: userAttributes),
+      );
+      // TODO: use sucessfull result to redirect user
+    } on AuthException catch (e) {
+      safePrint(e.message);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -60,7 +82,7 @@ class SignupScreen extends StatelessWidget {
                     hintText: "Re-Enter Password",
                     obscureText: true),
                 const SizedBox(height: 20),
-                MyButton(onTap: SignUserUp),
+                MyButton(onTap: signUserUp),
                 const SizedBox(height: 10),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
